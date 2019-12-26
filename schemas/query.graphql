@@ -1,0 +1,38 @@
+query {
+  getEpoch {
+    header {
+      chainId
+      epochId
+      preHash
+      timestamp
+      logsBloom
+      orderRoot
+      confirmRoot
+      stateRoot
+      receiptRoot
+      cyclesUsed
+      proposer
+      proof {
+        epochId
+        round
+        epochHash
+        signature
+        bitmap
+      }
+      validatorVersion
+      validators {
+        address
+        proposeWeight
+        voteWeight
+      }
+    }
+    orderedTxHashes
+  }
+  search(q: "some_tx") {
+    ... on Epoch {
+      header {
+        epochId
+      }
+    }
+  }
+}

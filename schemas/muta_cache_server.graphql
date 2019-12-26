@@ -1,0 +1,141 @@
+scalar Uint64
+scalar Hash
+scalar Address
+scalar Bloom
+scalar Bytes
+scalar Balance
+
+type Query {
+  getEpoch(epochId: Uint64): Epoch
+  getTransaction(txHash: Hash!): Transaction
+  getAccount(address: Address): Account
+  getEpochs(pageInput: PageInput): Epochs!
+  getTransactions(pageInput: PageInput): Transactions!
+  getAccounts(pageInput: PageInput): Accounts!
+  search(q: String!): SearchResult
+}
+
+schema {
+  query: Query
+}
+
+union SearchResult = Epoch | Transaction | Account
+
+type Epochs {
+  epochs: [Epoch!]!
+  pageInfo: PageInfo!
+}
+
+type Transactions {
+  transactions: [Transaction!]!
+  pageInfo: PageInfo!
+}
+
+type Accounts {
+  accounts: [Account!]!
+  pageInfo: PageInfo!
+}
+
+input PageInput {
+  page: Int = 1
+  pageNum: Int = 10
+}
+
+type PageInfo {
+  page: Int!
+  pageNum: Int!
+  totalCount: Int!
+}
+
+type Account {
+  address: Address
+  transactions: [Transaction!]!
+}
+
+type EpochHeader {
+  chainId: Hash!
+  epochId: Uint64!
+  preHash: Hash!
+  timestamp: Uint64!
+  logsBloom: [Bloom!]!
+  orderRoot: Hash!
+  confirmRoot: [Hash!]!
+  stateRoot: Hash!
+  receiptRoot: [Hash!]!
+  cyclesUsed: [Uint64!]!
+  proposer: Address!
+  proof: Proof!
+  validatorVersion: Uint64!
+  validators: [Validator!]!
+}
+
+type Proof {
+  epochId: Uint64!
+  round: Uint64!
+  epochHash: Hash!
+  signature: Bytes!
+  bitmap: Bytes!
+}
+
+type Validator {
+  address: Address!
+  proposeWeight: Int!
+  voteWeight: Int!
+}
+
+type Epoch {
+  header: EpochHeader!
+  orderedTxHashes: [Hash!]!
+  orderedTx: [Transaction!]!
+}
+
+type Transaction {
+  txHash: Hash!
+  chainId: Hash!
+  nonce: Hash!
+  timeout: Uint64!
+  cyclesPrice: Uint64!
+  cyclesLimit: Uint64!
+  request: TransactionRequest!
+  pubkey: Bytes!
+  signature: Bytes!
+  from: Address!
+  epochId: Uint64!
+  epoch: Epoch!
+  txIndex: Int!
+  receipt: Receipt!
+}
+
+type TransactionRequest {
+  serviceName: String!
+  method: String!
+  payload: String!
+}
+
+type Receipt {
+  stateRoot: Hash!
+  epochId: Uint64!
+  epoch: Epoch!
+  txHash: Hash!
+  cyclesUsed: Uint64!
+  events: [Event!]!
+  response: ReceiptResponse!
+}
+
+type Event {
+  service: String!
+  data: String!
+}
+
+type ReceiptResponse {
+  serviceName: String!
+  method: String!
+  ret: String!
+  is_error: Boolean!
+}
+
+enum ContractType {
+  Asset
+  App
+  Library
+}
